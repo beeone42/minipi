@@ -27,8 +27,6 @@ def print_file(ser, fname):
         print_text(ser, content)
 
 ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=20, parity=serial.PARITY_NONE)
-#sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
-
 erase_scr(ser)
 
 last_nb = 1
@@ -36,17 +34,15 @@ while True:
     response = urllib.urlopen('http://enroll.42.fr/usage.php/')
     nb = response.read()
     if (nb != last_nb):
+        if (len(str(nb)) != len(str(last_nb))):
+            erase_scr(ser)
         if (int(nb) >= 1000):
             font = "bigascii9"
         else:
             font = "bigascii12"
         output = subprocess.Popen(["figlet", nb, "-f", font, "-w", "40", "-c" ], stdout=subprocess.PIPE).communicate()[0]
-#        print output
-
-#        erase_scr(ser)
         goto_top_left(ser)
         print_file(ser, '42.txt')
-#        print_file(ser, 'figlet.txt')
         print_text(ser, output)
         last_nb = nb
     time.sleep(10)
